@@ -1,4 +1,4 @@
-﻿import { Listing } from './listing';
+﻿import type { Listing } from './listing';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';

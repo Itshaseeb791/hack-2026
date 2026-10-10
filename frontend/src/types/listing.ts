@@ -2,41 +2,47 @@
 
 export type ListingSource = 'restaurant' | 'sponsored' | 'donated';
 
+// Matches the ListingOut shape returned by GET /listings on the backend
+// (backend/app/listings.py). The backend sends one unified `price` for the
+// caller's role (current_price for buyers, org_price for orgs) — it never
+// sends original_price/current_price/org_price here.
 export interface Listing {
-  id: string;
+  id: number;
   source: ListingSource;
-  vendor_name: string;
-  donor_name?: string;
+  vendor_name: string | null;
+  donor_name: string | null;
   title: string;
+  description: string | null;
   qty: number;
-  original_price: number;
-  current_price?: number;
-  org_price?: number;
-  sponsor_pct?: number;
+  price: number;
+  is_free: boolean;
+  sponsor_pct: number | null;
+  image_url: string | null;
   pickup_location: string;
   expiry_time: string;
-  prepared_at?: string;
-  dietary_notes?: string;
-  image_url: string;
-  audience: 'public' | 'orgs_only';
-  created_at: string;
-  status?: string;
-  claimed_by?: string;
-  pickup_code?: string;
+  minutes_left: number;
+  status: string;
 }
 
 export interface ReservationRequest {
-  name: string;
+  role: 'buyer' | 'org';
   qty: number;
+  name?: string;   // required when role === 'buyer'
+  org_id?: number; // required when role === 'org'
 }
 
 export interface ReservationResponse {
+  reservation_id: number;
   pickup_code: string;
-  listing: Listing;
+  qty: number;
+  price_per_unit: number;
+  total_price: number;
+  pickup_location: string;
+  expiry_time: string;
 }
 
 export interface SponsorRequest {
   donor_name: string;
-  units: number;
+  qty: number;
   sponsor_pct: number;
 }

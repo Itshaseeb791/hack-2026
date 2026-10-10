@@ -1,4 +1,4 @@
-﻿import json
+import json
 import os
 import base64
 import uuid
@@ -14,7 +14,7 @@ from sqlmodel import Session, select
 
 from app.models import get_session, Listing, Organization
 from app.listings import search_listings, _to_out, UPLOAD_DIR
-from app.reservations import reserve_listing_internal
+from app.reservations import reserve_listing_core
 
 router = APIRouter()
 
@@ -182,7 +182,7 @@ def _execute_tool(tool_name: str, args: dict, session: Session, role: str, uploa
             return {"success": True, "listings": [l.model_dump(mode="json") for l in listings]}
         
         elif tool_name == "reserve_food":
-            result = reserve_listing_internal(
+            result = reserve_listing_core(session,
                 session,
                 listing_id=args["listing_id"],
                 name=args["buyer_name"],
@@ -191,11 +191,11 @@ def _execute_tool(tool_name: str, args: dict, session: Session, role: str, uploa
             return {
                 "success": True,
                 "pickup_code": result["pickup_code"],
-                "message": f"✅ Reserved {result['qty']} units! Pickup code: {result['pickup_code']}. Location: {result['pickup_location']}. Total: Rs {result['total_price']}"
+                "message": f"? Reserved {result['qty']} units! Pickup code: {result['pickup_code']}. Location: {result['pickup_location']}. Total: Rs {result['total_price']}"
             }
         
         elif tool_name == "claim_food":
-            result = reserve_listing_internal(
+            result = reserve_listing_core(session,
                 session,
                 listing_id=args["listing_id"],
                 name=args["organization_name"],
@@ -204,7 +204,7 @@ def _execute_tool(tool_name: str, args: dict, session: Session, role: str, uploa
             return {
                 "success": True,
                 "pickup_code": result["pickup_code"],
-                "message": f"✅ Claimed {result['qty']} units! Pickup code: {result['pickup_code']}. Location: {result['pickup_location']}. Total: Rs {result['total_price']}"
+                "message": f"? Claimed {result['qty']} units! Pickup code: {result['pickup_code']}. Location: {result['pickup_location']}. Total: Rs {result['total_price']}"
             }
         
         elif tool_name == "create_listing":
@@ -232,7 +232,7 @@ def _execute_tool(tool_name: str, args: dict, session: Session, role: str, uploa
             return {
                 "success": True,
                 "listing_id": str(listing.id),
-                "message": f"✅ Listing created! {listing.qty} x {listing.title} now live on SaveFood (ID: {listing.id})"
+                "message": f"? Listing created! {listing.qty} x {listing.title} now live on SaveFood (ID: {listing.id})"
             }
         
         elif tool_name == "sponsor_listing":
@@ -282,7 +282,7 @@ def _execute_tool(tool_name: str, args: dict, session: Session, role: str, uploa
             
             return {
                 "success": True,
-                "message": f"✅ Sponsored! {units} units moved to orgs-only feed. Your cost: Rs {cost}. {free_text}"
+                "message": f"? Sponsored! {units} units moved to orgs-only feed. Your cost: Rs {cost}. {free_text}"
             }
         
         else:

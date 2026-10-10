@@ -1,5 +1,6 @@
 import random
 import string
+from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -39,11 +40,21 @@ class ReserveResponse(BaseModel):
     expiry_time: str
 
 
-@router.post("/listings/{listing_id}/reserve", response_model=ReserveResponse)
-def reserve_listing(listing_id: int, body: ReserveRequest, session: Session = Depends(get_session)):
-    if body.role not in {"buyer", "org"}:
+# Shared by the HTTP endpoint below and the chatbot's reserve_food/claim_food
+# tools (app/chat.py), so a chat-driven reservation gets the same role/
+# audience checks and the same org_id tracking (donor impact in
+# app/donors.py depends on org_id being set) as a button-driven one.
+def reserve_listing_core(
+    session: Session,
+    listing_id: int,
+    role: str,
+    qty: int,
+    name: Optional[str] = None,
+    org_id: Optional[int] = None,
+) -> ReserveResponse:
+    if role not in {"buyer", "org"}:
         raise HTTPException(422, "role must be 'buyer' or 'org'")
-    if body.qty <= 0:
+    if qty <= 0:
         raise HTTPException(422, "qty must be greater than 0")
 
     # Lock the row so two concurrent reservations can't both read stale qty.
@@ -56,31 +67,30 @@ def reserve_listing(listing_id: int, body: ReserveRequest, session: Session = De
     if listing.status != "available":
         raise HTTPException(409, "listing is no longer available")
 
-    from datetime import datetime
     if listing.expiry_time <= datetime.utcnow():
         raise HTTPException(409, "listing has expired")
 
-    expected_audience = "public" if body.role == "buyer" else "orgs_only"
+    expected_audience = "public" if role == "buyer" else "orgs_only"
     if listing.audience != expected_audience:
-        raise HTTPException(403, f"{body.role} cannot reserve this listing")
+        raise HTTPException(403, f"{role} cannot reserve this listing")
 
-    if body.qty > listing.qty:
+    if qty > listing.qty:
         raise HTTPException(422, f"only {listing.qty} left")
 
-    if body.role == "buyer":
-        if not body.name:
+    if role == "buyer":
+        if not name:
             raise HTTPException(422, "name is required for buyer reservations")
-        reserved_by = body.name
-        org_id = None
+        reserved_by = name
+        resolved_org_id = None
         price_per_unit = listing.current_price if listing.current_price is not None else 0.0
     else:
-        if body.org_id is None:
+        if org_id is None:
             raise HTTPException(422, "org_id is required for org reservations")
-        org = session.get(Organization, body.org_id)
+        org = session.get(Organization, org_id)
         if not org:
             raise HTTPException(404, "organization not found")
         reserved_by = org.name
-        org_id = org.id
+        resolved_org_id = org.id
         price_per_unit = listing.org_price if listing.org_price is not None else 0.0
 
     pickup_code = _generate_pickup_code(session)
@@ -88,15 +98,15 @@ def reserve_listing(listing_id: int, body: ReserveRequest, session: Session = De
     reservation = Reservation(
         listing_id=listing.id,
         reserved_by=reserved_by,
-        org_id=org_id,
-        qty=body.qty,
+        org_id=resolved_org_id,
+        qty=qty,
         price_per_unit=price_per_unit,
         pickup_code=pickup_code,
         status="reserved",
     )
     session.add(reservation)
 
-    listing.qty -= body.qty
+    listing.qty -= qty
     if listing.qty == 0:
         listing.status = "sold_out"
     session.add(listing)
@@ -107,12 +117,17 @@ def reserve_listing(listing_id: int, body: ReserveRequest, session: Session = De
     return ReserveResponse(
         reservation_id=reservation.id,
         pickup_code=pickup_code,
-        qty=body.qty,
+        qty=qty,
         price_per_unit=price_per_unit,
-        total_price=round(price_per_unit * body.qty, 2),
+        total_price=round(price_per_unit * qty, 2),
         pickup_location=listing.pickup_location,
         expiry_time=listing.expiry_time.isoformat(),
     )
+
+
+@router.post("/listings/{listing_id}/reserve", response_model=ReserveResponse)
+def reserve_listing(listing_id: int, body: ReserveRequest, session: Session = Depends(get_session)):
+    return reserve_listing_core(session, listing_id, body.role, body.qty, body.name, body.org_id)
 
 
 class PickupRequest(BaseModel):
@@ -148,49 +163,3 @@ def list_reservations(
     if org_id is not None:
         stmt = stmt.where(Reservation.org_id == org_id)
     return session.exec(stmt).all()
-# Add this helper function at the end of reservations.py before the router endpoints
-def reserve_listing_internal(session: Session, listing_id: str, name: str, qty: int) -> dict:
-    """Internal function for agent to reserve/claim listings"""
-    listing_id_int = int(listing_id)
-    
-    listing = session.exec(
-        select(Listing).where(Listing.id == listing_id_int).with_for_update()
-    ).first()
-    
-    if not listing:
-        raise ValueError("Listing not found")
-    
-    if listing.qty < qty:
-        raise ValueError(f"Only {listing.qty} units available")
-    
-    from datetime import datetime
-    if listing.expiry_time <= datetime.utcnow():
-        raise ValueError("Listing has expired")
-    
-    pickup_code = _generate_pickup_code(session)
-    price_per_unit = listing.org_price if listing.audience == "orgs_only" else listing.current_price or 0
-    
-    reservation = Reservation(
-        listing_id=listing.id,
-        reserved_by=name,
-        qty=qty,
-        price_per_unit=price_per_unit,
-        pickup_code=pickup_code,
-        status="reserved",
-    )
-    session.add(reservation)
-    
-    listing.qty -= qty
-    if listing.qty == 0:
-        listing.status = "sold_out"
-    session.add(listing)
-    
-    session.commit()
-    session.refresh(reservation)
-    
-    return {
-        "pickup_code": pickup_code,
-        "qty": qty,
-        "total_price": round(price_per_unit * qty, 2),
-        "pickup_location": listing.pickup_location,
-    }
