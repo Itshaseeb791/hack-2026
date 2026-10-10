@@ -148,3 +148,49 @@ def list_reservations(
     if org_id is not None:
         stmt = stmt.where(Reservation.org_id == org_id)
     return session.exec(stmt).all()
+# Add this helper function at the end of reservations.py before the router endpoints
+def reserve_listing_internal(session: Session, listing_id: str, name: str, qty: int) -> dict:
+    """Internal function for agent to reserve/claim listings"""
+    listing_id_int = int(listing_id)
+    
+    listing = session.exec(
+        select(Listing).where(Listing.id == listing_id_int).with_for_update()
+    ).first()
+    
+    if not listing:
+        raise ValueError("Listing not found")
+    
+    if listing.qty < qty:
+        raise ValueError(f"Only {listing.qty} units available")
+    
+    from datetime import datetime
+    if listing.expiry_time <= datetime.utcnow():
+        raise ValueError("Listing has expired")
+    
+    pickup_code = _generate_pickup_code(session)
+    price_per_unit = listing.org_price if listing.audience == "orgs_only" else listing.current_price or 0
+    
+    reservation = Reservation(
+        listing_id=listing.id,
+        reserved_by=name,
+        qty=qty,
+        price_per_unit=price_per_unit,
+        pickup_code=pickup_code,
+        status="reserved",
+    )
+    session.add(reservation)
+    
+    listing.qty -= qty
+    if listing.qty == 0:
+        listing.status = "sold_out"
+    session.add(listing)
+    
+    session.commit()
+    session.refresh(reservation)
+    
+    return {
+        "pickup_code": pickup_code,
+        "qty": qty,
+        "total_price": round(price_per_unit * qty, 2),
+        "pickup_location": listing.pickup_location,
+    }
