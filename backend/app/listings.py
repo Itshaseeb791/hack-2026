@@ -1,6 +1,6 @@
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone as dt_timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
@@ -61,6 +61,15 @@ def create_listing_internal(
         raise HTTPException(422, f"source must be one of {sorted(VALID_SOURCES)}")
     if qty <= 0:
         raise HTTPException(422, "qty must be greater than 0")
+
+    def _naive_utc(dt: datetime) -> datetime:
+        if dt.tzinfo is not None:
+            return dt.astimezone(dt_timezone.utc).replace(tzinfo=None)
+        return dt
+
+    expiry_time = _naive_utc(expiry_time)
+    prepared_at = _naive_utc(prepared_at) if prepared_at is not None else None
+
     if expiry_time <= datetime.utcnow():
         raise HTTPException(422, "expiry_time must be in the future")
 
