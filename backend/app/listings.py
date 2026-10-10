@@ -38,23 +38,25 @@ def _save_photo(photo: UploadFile) -> str:
     return f"/uploads/{filename}"
 
 
-@router.post("/listings", response_model=Listing)
-def create_listing(
-    source: str = Form(...),
-    title: str = Form(...),
-    qty: int = Form(...),
-    pickup_location: str = Form(...),
-    expiry_time: datetime = Form(...),
-    description: Optional[str] = Form(default=None),
-    vendor_name: Optional[str] = Form(default=None),
-    original_price: Optional[float] = Form(default=None),
-    current_price: Optional[float] = Form(default=None),
-    donor_name: Optional[str] = Form(default=None),
-    sponsor_pct: Optional[int] = Form(default=None),
-    prepared_at: Optional[datetime] = Form(default=None),
-    photo: Optional[UploadFile] = File(default=None),
-    session: Session = Depends(get_session),
-):
+# Shared by the HTTP endpoint below and the chatbot's create_listing tool
+# (app/chat.py), so both paths get the same validation instead of the
+# chatbot bypassing it with a second, looser implementation.
+def create_listing_internal(
+    session: Session,
+    source: str,
+    title: str,
+    qty: int,
+    pickup_location: str,
+    expiry_time: datetime,
+    description: Optional[str] = None,
+    vendor_name: Optional[str] = None,
+    original_price: Optional[float] = None,
+    current_price: Optional[float] = None,
+    donor_name: Optional[str] = None,
+    sponsor_pct: Optional[int] = None,
+    prepared_at: Optional[datetime] = None,
+    image_url: Optional[str] = None,
+) -> Listing:
     if source not in VALID_SOURCES:
         raise HTTPException(422, f"source must be one of {sorted(VALID_SOURCES)}")
     if qty <= 0:
@@ -90,8 +92,6 @@ def create_listing(
         original_price = 0
         org_price = 0
 
-    image_url = _save_photo(photo) if photo is not None else None
-
     listing = Listing(
         source=source,
         vendor_name=vendor_name,
@@ -114,6 +114,42 @@ def create_listing(
     session.commit()
     session.refresh(listing)
     return listing
+
+
+@router.post("/listings", response_model=Listing)
+def create_listing(
+    source: str = Form(...),
+    title: str = Form(...),
+    qty: int = Form(...),
+    pickup_location: str = Form(...),
+    expiry_time: datetime = Form(...),
+    description: Optional[str] = Form(default=None),
+    vendor_name: Optional[str] = Form(default=None),
+    original_price: Optional[float] = Form(default=None),
+    current_price: Optional[float] = Form(default=None),
+    donor_name: Optional[str] = Form(default=None),
+    sponsor_pct: Optional[int] = Form(default=None),
+    prepared_at: Optional[datetime] = Form(default=None),
+    photo: Optional[UploadFile] = File(default=None),
+    session: Session = Depends(get_session),
+):
+    image_url = _save_photo(photo) if photo is not None else None
+    return create_listing_internal(
+        session,
+        source=source,
+        title=title,
+        qty=qty,
+        pickup_location=pickup_location,
+        expiry_time=expiry_time,
+        description=description,
+        vendor_name=vendor_name,
+        original_price=original_price,
+        current_price=current_price,
+        donor_name=donor_name,
+        sponsor_pct=sponsor_pct,
+        prepared_at=prepared_at,
+        image_url=image_url,
+    )
 
 
 class ListingOut(BaseModel):
