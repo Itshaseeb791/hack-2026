@@ -8,16 +8,16 @@ interface SplitScreenLayoutProps {
 
 export const SplitScreenLayout: React.FC<SplitScreenLayoutProps> = ({ left, right }) => {
   return (
-    <div className="flex flex-col tablet:flex-row h-screen">
+    <div className="flex flex-col tablet:flex-row h-full">
       {/* Left: Chat — its own boundary so a chat crash can't take down the feed pane */}
-      <div className="w-full tablet:w-1/2 border-r border-border flex flex-col">
+      <div className="w-full tablet:w-1/2 border-r border-border flex flex-col h-full overflow-hidden min-h-[260px]">
         <ErrorBoundary>{left}</ErrorBoundary>
       </div>
 
       {/* Right: role content — its own boundary so a feed crash can't take down chat.
           overflow-y-auto because feeds/forms here don't manage their own scroll
           (unlike ChatContainer on the left, which does). */}
-      <div className="w-full tablet:w-1/2 flex flex-col overflow-y-auto">
+      <div className="w-full tablet:w-1/2 flex flex-col overflow-y-auto h-full">
         <ErrorBoundary>{right}</ErrorBoundary>
       </div>
     </div>
