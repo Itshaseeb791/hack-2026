@@ -1,8 +1,10 @@
 ﻿import json
 import os
 import base64
+import uuid
 from datetime import datetime, timedelta
 from typing import Optional
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
@@ -11,7 +13,7 @@ from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from app.models import get_session, Listing, Organization
-from app.listings import search_listings, _to_out, create_listing_internal
+from app.listings import search_listings, _to_out, UPLOAD_DIR
 from app.reservations import reserve_listing_internal
 
 router = APIRouter()
@@ -19,7 +21,7 @@ router = APIRouter()
 DEEPSEEK_KEY = os.environ.get("DEEPSEEK_KEY")
 client = OpenAI(api_key=DEEPSEEK_KEY, base_url="https://api.deepseek.com") if DEEPSEEK_KEY else None
 
-# Enhanced tools with actions
+# Enhanced tools with ALL actions
 TOOLS = [
     {
         "type": "function",
@@ -42,7 +44,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "reserve_food",
-            "description": "Reserve food for a buyer. Call this when user confirms they want to reserve.",
+            "description": "Reserve food for a buyer. Call this ONLY after user confirms with 'yes' or similar.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -58,7 +60,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "claim_food",
-            "description": "Claim food for an organization. Call this when org confirms they want to claim.",
+            "description": "Claim food for an organization. Call this ONLY after org confirms with 'yes' or similar.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -74,7 +76,7 @@ TOOLS = [
         "type": "function",
         "function": {
             "name": "create_listing",
-            "description": "Create a new food listing. Used when vendor describes food they want to post.",
+            "description": "Create a new food listing. Used when vendor describes food they want to post. If user provided an image, it will be available.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -87,6 +89,23 @@ TOOLS = [
                     "expiry_hours": {"type": "number", "description": "Hours until food expires (default 4)"},
                 },
                 "required": ["vendor_name", "title", "quantity", "original_price", "current_price", "pickup_location"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "sponsor_listing",
+            "description": "Sponsor an existing listing. Donor pays a percentage, moving it to orgs-only feed. Call ONLY after donor confirms.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "listing_id": {"type": "string", "description": "ID of the listing to sponsor"},
+                    "donor_name": {"type": "string", "description": "Name of the donor"},
+                    "units": {"type": "number", "description": "Number of units to sponsor"},
+                    "sponsor_percentage": {"type": "number", "description": "Percentage to sponsor (1-100)"},
+                },
+                "required": ["listing_id", "donor_name", "units", "sponsor_percentage"],
             },
         },
     },
@@ -111,22 +130,42 @@ def _system_prompt(role: str) -> str:
     elif role == "org":
         audience = "You help ORGANIZATIONS (shelters/orphanages) find and claim free or subsidized food. You CAN claim food for them after they confirm."
     elif role == "vendor":
-        audience = "You help VENDORS post their surplus food listings. You CAN create listings for them based on their description."
+        audience = "You help VENDORS post their surplus food listings. You CAN create listings for them. If they send a photo, use it for the listing."
     else:  # donor
-        audience = "You help DONORS sponsor food for organizations. You CAN help them find food to sponsor."
+        audience = "You help DONORS sponsor food for organizations. You CAN sponsor existing listings after they confirm."
     
     return (
         f"You are SaveFood's AI assistant in Lahore, Pakistan. {audience} "
         "Always search first before answering questions about available food. "
         "Reply in the same language the user writes: English, Urdu, or Roman Urdu. "
         "Show prices as 'Rs 180' in PKR. "
-        "IMPORTANT: Before taking ANY action (reserve, claim, create), ask for confirmation with 'yes' or 'no'. "
-        "Only call action functions after the user explicitly confirms with 'yes', 'haan', 'ji', or similar. "
-        "After successful actions, provide the pickup code and details. "
+        "CRITICAL: Before taking ANY action (reserve, claim, create, sponsor), ask for confirmation with 'yes' or 'no'. "
+        "Only call action functions AFTER the user explicitly confirms with 'yes', 'haan', 'ji', 'theek hai', or similar affirmative. "
+        "After successful actions, provide the pickup code and clear instructions. "
         f"Current time: {now}."
     )
 
-def _execute_tool(tool_name: str, args: dict, session: Session, role: str) -> dict:
+def _save_uploaded_image(image_base64: str) -> str:
+    """Save base64 image and return URL path"""
+    try:
+        # Remove data URL prefix if present
+        if ',' in image_base64:
+            image_base64 = image_base64.split(',')[1]
+        
+        image_data = base64.b64decode(image_base64)
+        filename = f"{uuid.uuid4()}.jpg"
+        filepath = Path(UPLOAD_DIR) / filename
+        
+        Path(UPLOAD_DIR).mkdir(exist_ok=True)
+        with open(filepath, 'wb') as f:
+            f.write(image_data)
+        
+        return f"/uploads/{filename}"
+    except Exception as e:
+        print(f"Image save error: {e}")
+        return "/uploads/placeholder.jpg"
+
+def _execute_tool(tool_name: str, args: dict, session: Session, role: str, uploaded_image_url: Optional[str] = None) -> dict:
     """Execute agent tool and return result"""
     try:
         if tool_name == "search_listings":
@@ -149,7 +188,11 @@ def _execute_tool(tool_name: str, args: dict, session: Session, role: str) -> di
                 name=args["buyer_name"],
                 qty=args["quantity"],
             )
-            return {"success": True, "pickup_code": result["pickup_code"], "message": f"Reserved! Pickup code: {result['pickup_code']}"}
+            return {
+                "success": True,
+                "pickup_code": result["pickup_code"],
+                "message": f"✅ Reserved {result['qty']} units! Pickup code: {result['pickup_code']}. Location: {result['pickup_location']}. Total: Rs {result['total_price']}"
+            }
         
         elif tool_name == "claim_food":
             result = reserve_listing_internal(
@@ -158,13 +201,16 @@ def _execute_tool(tool_name: str, args: dict, session: Session, role: str) -> di
                 name=args["organization_name"],
                 qty=args["quantity"],
             )
-            return {"success": True, "pickup_code": result["pickup_code"], "message": f"Claimed! Pickup code: {result['pickup_code']}"}
+            return {
+                "success": True,
+                "pickup_code": result["pickup_code"],
+                "message": f"✅ Claimed {result['qty']} units! Pickup code: {result['pickup_code']}. Location: {result['pickup_location']}. Total: Rs {result['total_price']}"
+            }
         
         elif tool_name == "create_listing":
             expiry_hours = args.get("expiry_hours", 4)
             expiry_time = datetime.utcnow() + timedelta(hours=expiry_hours)
             
-            # Create placeholder listing (without image for now)
             listing_data = {
                 "source": "restaurant",
                 "vendor_name": args["vendor_name"],
@@ -175,7 +221,7 @@ def _execute_tool(tool_name: str, args: dict, session: Session, role: str) -> di
                 "pickup_location": args["pickup_location"],
                 "expiry_time": expiry_time,
                 "audience": "public",
-                "image_url": "/uploads/placeholder.jpg",  # Placeholder
+                "image_url": uploaded_image_url or "/uploads/placeholder.jpg",
             }
             
             listing = Listing(**listing_data)
@@ -183,7 +229,61 @@ def _execute_tool(tool_name: str, args: dict, session: Session, role: str) -> di
             session.commit()
             session.refresh(listing)
             
-            return {"success": True, "listing_id": str(listing.id), "message": f"Listing created! ID: {listing.id}"}
+            return {
+                "success": True,
+                "listing_id": str(listing.id),
+                "message": f"✅ Listing created! {listing.qty} x {listing.title} now live on SaveFood (ID: {listing.id})"
+            }
+        
+        elif tool_name == "sponsor_listing":
+            listing_id_int = int(args["listing_id"])
+            listing = session.get(Listing, listing_id_int)
+            
+            if not listing:
+                return {"success": False, "error": "Listing not found"}
+            
+            units = args["units"]
+            sponsor_pct = args["sponsor_percentage"]
+            
+            if units > listing.qty:
+                return {"success": False, "error": f"Only {listing.qty} units available"}
+            
+            # Calculate new org price
+            org_price = listing.original_price * (100 - sponsor_pct) / 100
+            
+            # Create new sponsored listing
+            sponsored_listing = Listing(
+                source="sponsored",
+                vendor_name=listing.vendor_name,
+                donor_name=args["donor_name"],
+                title=listing.title,
+                qty=units,
+                original_price=listing.original_price,
+                org_price=org_price,
+                sponsor_pct=sponsor_pct,
+                pickup_location=listing.pickup_location,
+                expiry_time=listing.expiry_time,
+                image_url=listing.image_url,
+                audience="orgs_only",
+            )
+            session.add(sponsored_listing)
+            
+            # Reduce original listing quantity
+            listing.qty -= units
+            if listing.qty == 0:
+                listing.status = "sold_out"
+            session.add(listing)
+            
+            session.commit()
+            session.refresh(sponsored_listing)
+            
+            cost = listing.original_price * units * sponsor_pct / 100
+            free_text = "FREE for orgs!" if sponsor_pct == 100 else f"Rs {org_price} for orgs"
+            
+            return {
+                "success": True,
+                "message": f"✅ Sponsored! {units} units moved to orgs-only feed. Your cost: Rs {cost}. {free_text}"
+            }
         
         else:
             return {"success": False, "error": f"Unknown tool: {tool_name}"}
@@ -191,7 +291,7 @@ def _execute_tool(tool_name: str, args: dict, session: Session, role: str) -> di
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-def _run_tool_loop(role: str, messages: list[dict], session: Session) -> tuple[list[dict], list]:
+def _run_tool_loop(role: str, messages: list[dict], session: Session, uploaded_image_url: Optional[str]) -> tuple[list[dict], list]:
     last_listings = []
     
     for round_num in range(MAX_TOOL_ROUNDS):
@@ -217,7 +317,7 @@ def _run_tool_loop(role: str, messages: list[dict], session: Session) -> tuple[l
             except json.JSONDecodeError:
                 args = {}
             
-            result = _execute_tool(tool_call.function.name, args, session, role)
+            result = _execute_tool(tool_call.function.name, args, session, role, uploaded_image_url)
             
             if result.get("listings"):
                 last_listings = result["listings"]
@@ -237,11 +337,22 @@ def chat(body: ChatRequest, session: Session = Depends(get_session)):
     if body.role not in {"buyer", "org", "vendor", "donor"}:
         raise HTTPException(422, "role must be buyer/org/vendor/donor")
 
+    # Handle uploaded image
+    uploaded_image_url = None
+    if body.image_base64:
+        uploaded_image_url = _save_uploaded_image(body.image_base64)
+
     messages = [{"role": "system", "content": _system_prompt(body.role)}]
     messages += [{"role": m.role, "content": m.content} for m in body.messages]
+    
+    # If image uploaded, add note to last user message
+    if uploaded_image_url and messages:
+        last_user_msg = next((m for m in reversed(messages) if m["role"] == "user"), None)
+        if last_user_msg:
+            last_user_msg["content"] += f" [User uploaded an image: {uploaded_image_url}]"
 
     def event_stream():
-        messages_after_tools, listings = _run_tool_loop(body.role, messages, session)
+        messages_after_tools, listings = _run_tool_loop(body.role, messages, session, uploaded_image_url)
 
         if listings:
             listings_json = json.dumps(listings)
