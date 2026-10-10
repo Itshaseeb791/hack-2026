@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: savefood
       POSTGRES_DB: savefood
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -14,6 +14,7 @@ services:
       interval: 2s
       timeout: 3s
       retries: 10
+    restart: unless-stopped
 
   app:
     build: .
@@ -22,13 +23,22 @@ services:
       DATABASE_URL: postgresql://savefood:savefood@db:5432/savefood
       TZ: Asia/Karachi
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
-      - ./app:/app/app
       - uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      args:
+        VITE_API_URL: https://apifood.thebullgym.com
+    ports:
+      - "127.0.0.1:3000:80"
+    restart: unless-stopped
 
 volumes:
   pgdata:
