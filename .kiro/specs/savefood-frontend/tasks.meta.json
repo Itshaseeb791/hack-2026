@@ -1,0 +1,482 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "2.1 Create TypeScript type definitions": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619435827
+      }
+    ],
+    "2.2 Implement validation utilities": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619438178
+      }
+    ],
+    "2.3 Implement formatting utilities": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619439156
+      }
+    ],
+    "2.4 Implement timezone utilities": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619439431
+      }
+    ],
+    "3.1 Create RoleContext with provider": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619439805
+      }
+    ],
+    "3.2 Create useRole hook": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619440027
+      }
+    ],
+    "3.3 Build RoleSelector component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619440275
+      }
+    ],
+    "4.1 Create listingService": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619440485
+      }
+    ],
+    "4.2 Create chatService": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619440712
+      }
+    ],
+    "4.3 Create organizationService": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619441126
+      }
+    ],
+    "4.4 Create donorService": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619441307
+      }
+    ],
+    "5. Checkpoint - Core foundation complete": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619441561
+      }
+    ],
+    "6.1 Build basic shared components": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619441796
+      }
+    ],
+    "6.2 Build ExpiryTimer component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619442219
+      }
+    ],
+    "6.3 Build ImageUpload component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619442393
+      }
+    ],
+    "7.1 Create usePolling hook": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619442574
+      }
+    ],
+    "7.2 Build ListingCard component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619442787
+      }
+    ],
+    "7.3 Build FeedContainer component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619443009
+      }
+    ],
+    "7.4 Build PublicFeed component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619443185
+      }
+    ],
+    "7.5 Build OrgsFeed component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619443487
+      }
+    ],
+    "8. Checkpoint - Feed system complete": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619443783
+      }
+    ],
+    "9.1 Build useClipboard hook": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619443988
+      }
+    ],
+    "9.2 Build ReservationModal component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619444254
+      }
+    ],
+    "9.3 Build PickupCodeDisplay component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619444442
+      }
+    ],
+    "10.1 Build VendorListingForm component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619444739
+      }
+    ],
+    "11.1 Build DonorSponsoredForm component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619445046
+      }
+    ],
+    "11.2 Build DonorDonationForm component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619445338
+      }
+    ],
+    "11.3 Build SponsorExistingModal component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619445589
+      }
+    ],
+    "12.1 Build VendorDashboard component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619445852
+      }
+    ],
+    "12.2 Build PickupCodeEntry component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619446116
+      }
+    ],
+    "12.3 Build DonorDashboard component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619446306
+      }
+    ],
+    "12.4 Build ImpactView component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619446510
+      }
+    ],
+    "13. Checkpoint - Core listing flows complete": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619446773
+      }
+    ],
+    "14.1 Build OrganizationRegistry component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619446968
+      }
+    ],
+    "14.2 Build OrganizationList component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619447175
+      }
+    ],
+    "15.1 Create ChatContext with provider": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619447468
+      }
+    ],
+    "15.2 Create useSSE hook": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619447707
+      }
+    ],
+    "15.3 Create useChat hook": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619447952
+      }
+    ],
+    "15.4 Build ChatMessage component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619448230
+      }
+    ],
+    "15.5 Build ListingCardInChat component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619448426
+      }
+    ],
+    "15.6 Build ChatMessageList component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619448649
+      }
+    ],
+    "15.7 Build ChatInput component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619448853
+      }
+    ],
+    "15.8 Build ChatContainer component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619449086
+      }
+    ],
+    "16.1 Create useVoice hook": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619449286
+      }
+    ],
+    "16.2 Build VoiceButton component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619449530
+      }
+    ],
+    "16.3 Integrate voice with ChatInput": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619449804
+      }
+    ],
+    "17. Checkpoint - Chat and voice complete": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619450101
+      }
+    ],
+    "18.1 Build Header component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619450299
+      }
+    ],
+    "18.2 Build SplitScreenLayout component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619450558
+      }
+    ],
+    "18.3 Build AppLayout component": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619450757
+      }
+    ],
+    "18.4 Set up React Router": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619450988
+      }
+    ],
+    "19.1 Implement code splitting": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619451236
+      }
+    ],
+    "19.2 Optimize images": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619451450
+      }
+    ],
+    "19.3 Configure React Query": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619451726
+      }
+    ],
+    "19.4 Configure build optimizations": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619451933
+      }
+    ],
+    "20.1 Enhance API error handling": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619452180
+      }
+    ],
+    "20.2 Add request timeouts": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619452364
+      }
+    ],
+    "20.3 Handle listing unavailability": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619452598
+      }
+    ],
+    "20.4 Add loading states": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619452817
+      }
+    ],
+    "21.1 Wire all components together in App.tsx": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619453032
+      }
+    ],
+    "21.2 Test responsive design": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619453250
+      }
+    ],
+    "21.3 Test browser compatibility": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619453455
+      }
+    ],
+    "21.4 Accessibility review": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619453681
+      }
+    ],
+    "21.5 Environment configuration": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619453891
+      }
+    ],
+    "22. Final checkpoint - Full application ready": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619454084
+      }
+    ],
+    "1. Project setup and foundation": [
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619474627
+      },
+      {
+        "executionId": "df48d315-ce02-4ad1-b924-91884d2ac771",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791619491836
+      },
+      {
+        "executionId": "9cb50af8-8c0d-4a3b-a3bf-bd6b1402ed88",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791620064096
+      },
+      {
+        "executionId": "c4c1ea2a-dba0-4d9e-be7e-ab890e02d3d1",
+        "chatSessionId": "sess_ac9d2ad3-6805-4a66-a323-18e7b65916c3",
+        "timestamp": 1791620986761
+      }
+    ]
+  }
+}
