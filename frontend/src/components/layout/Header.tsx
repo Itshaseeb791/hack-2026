@@ -1,27 +1,25 @@
-﻿import React from 'react';
+import React from 'react';
 import { useRole } from '../../context/RoleContext';
+import { Button } from '../common/Button';
 
 export const Header: React.FC = () => {
   const { role, setRole } = useRole();
 
   return (
-    <header className="bg-green-600 text-white p-4 flex justify-between items-center">
+    <header className="bg-brand-600 text-white px-4 py-3 flex justify-between items-center shadow-card">
       <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-bold">SaveFood</h1>
+        <h1 className="text-xl font-bold tracking-tight">SaveFood</h1>
         {role && (
-          <span className="bg-white text-green-600 px-3 py-1 rounded-full text-sm font-medium capitalize">
+          <span className="bg-white text-brand-700 px-3 py-1 rounded-full text-xs font-semibold capitalize">
             {role}
           </span>
         )}
       </div>
-      
+
       {role && (
-        <button
-          onClick={() => setRole(null)}
-          className="bg-white text-green-600 px-4 py-2 rounded hover:bg-gray-100 transition"
-        >
+        <Button variant="secondary" size="sm" onClick={() => setRole(null)}>
           Change Role
-        </button>
+        </Button>
       )}
     </header>
   );

@@ -5,6 +5,8 @@ import { Header } from './components/layout/Header';
 import { SplitScreenLayout } from './components/layout/SplitScreenLayout';
 import { ChatContainer } from './components/chat/ChatContainer';
 import { FeedTabs } from './components/feed/FeedTabs';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { ToastProvider } from './context/ToastContext';
 import './index.css';
 
 const AppContent: React.FC = () => {
@@ -29,9 +31,13 @@ const AppContent: React.FC = () => {
 
 function App() {
   return (
-    <RoleProvider>
-      <AppContent />
-    </RoleProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <RoleProvider>
+          <AppContent />
+        </RoleProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }
 

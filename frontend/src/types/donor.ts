@@ -1,11 +1,7 @@
-﻿export interface ImpactData {
-  total_units_collected: number;
-  total_value_pkr: number;
-  organizations_served: number;
-  breakdown: {
-    vendor_name: string;
-    title: string;
-    organization: string;
-    qty: number;
-  }[];
+// Matches GET /donors/{name}/impact exactly (backend/app/donors.py:donor_impact).
+export interface ImpactData {
+  donor_name: string;
+  meals_delivered: number;
+  amount_sponsored_pkr: number;
+  organizations_helped: { name: string; type: 'shelter' | 'orphanage'; meals: number }[];
 }
