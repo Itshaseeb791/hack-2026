@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { useRole } from '../../context/RoleContext';
-import { Role } from '../../types';
+import type { Role } from '../../types';
 
 export const RoleSelector: React.FC = () => {
   const { setRole } = useRole();

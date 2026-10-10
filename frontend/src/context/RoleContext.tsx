@@ -1,5 +1,5 @@
-﻿import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { Role } from '../types';
+﻿import React, { createContext, useState, useContext, type ReactNode } from 'react';
+import type { Role } from '../types';
 
 interface RoleState {
   role: Role | null;
