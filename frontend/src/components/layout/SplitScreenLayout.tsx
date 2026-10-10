@@ -8,7 +8,7 @@ interface SplitScreenLayoutProps {
 
 export const SplitScreenLayout: React.FC<SplitScreenLayoutProps> = ({ left, right }) => {
   return (
-    <div className="flex flex-col tablet:flex-row h-screen">
+    <div className="flex flex-col tablet:flex-row h-full">
       {/* Left: Chat — its own boundary so a chat crash can't take down the feed pane */}
       <div className="w-full tablet:w-1/2 border-r border-border flex flex-col">
         <ErrorBoundary>{left}</ErrorBoundary>
