@@ -6,7 +6,15 @@ export const VendorListingForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const fd = new FormData();
-    Object.entries(formData).forEach(([k, v]) => { if (v) fd.append(k, k === 'photo' ? v : String(v)); });
+    Object.entries(formData).forEach(([k, v]) => {
+      if (!v) return;
+      if (k === 'photo') { fd.append(k, v as File); return; }
+      // datetime-local gives a naive local string (e.g. "2026-10-10T21:00");
+      // the backend compares expiry_time against UTC, so convert it to a
+      // real UTC instant here rather than sending it as-is.
+      if (k === 'expiry_time') { fd.append(k, new Date(v as string).toISOString()); return; }
+      fd.append(k, String(v));
+    });
     fd.append('source', 'restaurant');
     try { await listingService.createListing(fd); alert('Listing created!'); } catch (e) { alert('Error creating listing'); }
   };
